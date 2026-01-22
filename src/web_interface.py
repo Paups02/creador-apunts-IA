@@ -9,6 +9,12 @@ from pathlib import Path
 from typing import Optional, List, Tuple
 import pandas as pd
 from datetime import datetime
+import sys
+import os
+
+# Asegurar que src está en el path
+if os.path.dirname(__file__) not in sys.path:
+    sys.path.insert(0, os.path.dirname(__file__))
 
 from document_manager import DocumentManager
 from document_processor import DocumentProcessor
