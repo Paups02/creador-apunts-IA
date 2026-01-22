@@ -1,227 +1,404 @@
-# PDF to Cornell Notes Converter 📚
+# 🤖 Agente de IA Documental Profesional
 
-Transform your PDF documents into beautifully formatted Cornell Method study notes with AI enhancement.
+**Sistema inteligente de gestión documental con capacidades avanzadas de IA**
 
-## Features
+Transforme sus documentos en conocimiento accionable con el poder de Claude Anthropic y Google AI.
 
-- **Cornell Method Formatting**: Professional two-column layout with cue questions, main notes, and summary
-- **AI-Enhanced Notes**: Uses Claude AI to transform raw PDF content into structured, study-optimized notes
-- **Visual Hierarchy**: Colored titles, headings, tables, and emphasis for easy scanning
-- **Mixed Content Support**: Handles text, tables, and images from PDFs
-- **Interactive Interface**: Beautiful command-line menu for easy operation
-- **Batch Processing**: Handles long PDFs by intelligently chunking content
+---
 
-## What is the Cornell Method?
+## ✨ Características Principales
 
-The Cornell Method is a note-taking system that divides the page into three sections:
-1. **Cue Column (left)**: Questions and keywords that trigger recall
-2. **Notes Column (right)**: Main notes with hierarchical structure
-3. **Summary (bottom)**: Synthesis of key concepts
+### 📄 Gestión Multi-Formato
+- **PDF**: Extracción completa de texto, tablas e imágenes
+- **Word (DOCX)**: Procesamiento de párrafos, tablas y metadatos
+- **Excel (XLSX/CSV)**: Análisis de datos y estadísticas
+- **Imágenes**: Soporte para PNG, JPG, JPEG, BMP, GIF, WEBP
+- **Texto**: TXT, MD, JSON
 
-This format is proven to enhance learning and retention through active recall.
+### 🤖 IA Avanzada (Claude Anthropic)
+- **Informes profesionales**: Genera informes completos con análisis detallado
+- **Correos corporativos**: Redacta emails profesionales basados en documentos
+- **Resúmenes inteligentes**: Síntesis automática de contenido
+- **Traducciones**: Traducción multilingüe manteniendo el contexto
+- **Análisis profundo**: Identifica patrones, tendencias e insights
+- **Respuestas a preguntas**: Chat interactivo con tus documentos
+- **Extracción de datos**: Obtén información específica automáticamente
+- **Comparaciones**: Analiza diferencias entre documentos
+- **Mejora de contenido**: Optimiza y perfecciona textos
 
-## Installation
+### 📊 Visualizaciones Profesionales
+- **Gráficos automáticos**: Barras, líneas, pastel, dispersión, histogramas
+- **Dashboards completos**: Múltiples visualizaciones en un solo panel
+- **Mapas de calor**: Análisis de correlaciones
+- **Tablas visuales**: Representación profesional de datos
+- **Infografías**: Resúmenes visuales atractivos
 
-### Prerequisites
+### 💬 Interfaz Intuitiva
+- **Web moderna**: Interfaz Gradio responsive y elegante
+- **Chat interactivo**: Conversación natural con documentos
+- **Búsqueda inteligente**: Encuentra documentos por contenido, tags o descripción
+- **Gestión completa**: Organiza, etiqueta y administra tu repositorio
 
-- Python 3.8 or higher
-- Anthropic API key ([get one here](https://console.anthropic.com/))
+---
 
-### Setup Steps
+## 🚀 Instalación Rápida
 
-1. **Clone or download this repository**
+### Requisitos Previos
 
-2. **Install dependencies**:
+- **Python 3.8+**
+- **API Keys**:
+  - [Anthropic API Key](https://console.anthropic.com/) (Obligatoria)
+  - [Google AI API Key](https://makersuite.google.com/app/apikey) (Opcional, para visualizaciones)
+
+### Pasos de Instalación
+
+1. **Clonar el repositorio**:
+   ```bash
+   git clone <repository-url>
+   cd creador-apunts-IA
+   ```
+
+2. **Instalar dependencias**:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Set up your API key**:
-   - Copy `.env.example` to `.env`:
-     ```bash
-     cp .env.example .env
-     ```
-   - Edit `.env` and add your Anthropic API key:
-     ```
-     ANTHROPIC_API_KEY=your_api_key_here
-     ```
+3. **Configurar API Keys**:
 
-## Usage
+   Crea un archivo `.env` en la raíz del proyecto:
+   ```bash
+   # API Keys
+   ANTHROPIC_API_KEY=sk-ant-api03-tu-api-key-aqui
+   GOOGLE_API_KEY=tu-google-api-key-aqui
+   ```
 
-### Interactive Mode (Recommended)
+4. **Lanzar la aplicación**:
+   ```bash
+   python app.py
+   ```
 
-Simply run the main script:
-
-```bash
-python -m src.main
-```
-
-The interactive menu will guide you through:
-1. Selecting a PDF file
-2. Choosing output location
-3. Converting to Cornell notes
-
-### Example Session
-
-```
-╔═══════════════════════════════════════════════════════════════╗
-║                                                               ║
-║         📚 PDF to Cornell Notes Converter 📝                  ║
-║                                                               ║
-║   Transform PDFs into beautifully formatted study notes      ║
-║   using the Cornell Method with AI enhancement               ║
-║                                                               ║
-╚═══════════════════════════════════════════════════════════════╝
-
-Step 1: Select PDF File
-Enter path to PDF file: my_textbook.pdf
-✓ Selected: my_textbook.pdf (1,234.5 KB)
-
-Step 2: Choose Output Location
-Default: my_textbook_cornell_notes.docx
-Use default output path? [y/n]: y
-✓ Output: my_textbook_cornell_notes.docx
-
-Step 3: Converting to Cornell Notes
-⠋ Extracting content from PDF...
-Pages     │ 15
-Words     │ 8,432
-Tables    │ 3
-Images    │ Yes
-
-⠋ Generating Cornell Method notes with AI...
-⠋ Creating formatted DOCX file...
-
-╭─────────────────────────────────────────────────────────────╮
-│                                                             │
-│ ✓ Success! Your Cornell Method notes have been created:    │
-│   📄 my_textbook_cornell_notes.docx                         │
-│                                                             │
-│ Open the file to view your beautifully formatted notes!    │
-│                                                             │
-╰─────────────────────────────────────────────────────────────╯
-
-Convert another PDF? [y/n]: n
-
-Thank you for using Cornell Notes Converter!
-Happy studying! 📚
-```
-
-## Output Format
-
-The generated DOCX file includes:
-
-### Title Section
-- Large, colored title at the top
-- Centered and prominent
-
-### Cornell Layout (for each section)
-```
-┌─────────────┬────────────────────────────────┐
-│             │                                │
-│ Cue         │ Main Notes                     │
-│ Questions:  │ • Clear hierarchical structure │
-│             │ • Bullet points                │
-│ • What is   │ • Tables for data              │
-│   X?        │ • Definitions highlighted      │
-│ • Why does  │ • Examples clearly marked      │
-│   Y matter? │                                │
-│             │                                │
-├─────────────┴────────────────────────────────┤
-│ Summary:                                     │
-│ 3-5 sentences synthesizing key concepts     │
-└──────────────────────────────────────────────┘
-```
-
-### Visual Elements
-- **Color-coded sections**: Titles, headings, and summaries use professional blue tones
-- **Tables**: Structured data with headers and clear formatting
-- **Emphasis**: Key terms and definitions highlighted
-- **Hierarchy**: Multiple levels of indentation and formatting
-
-## Project Structure
-
-```
-Experiments/
-├── .env                    # Your API key (create this)
-├── .env.example           # Template for API key
-├── requirements.txt       # Python dependencies
-├── README.md             # This file
-└── src/
-    ├── __init__.py
-    ├── main.py           # Interactive menu interface
-    ├── pdf_extractor.py  # PDF content extraction
-    ├── note_generator.py # Claude API integration
-    ├── docx_formatter.py # Cornell Method formatting
-    └── config.py         # Configuration and constants
-```
-
-## Configuration
-
-Edit `src/config.py` to customize:
-- Color scheme
-- Font sizes and styles
-- Cornell layout dimensions
-- API settings (model, tokens, timeout)
-- Prompts for AI generation
-
-## Troubleshooting
-
-### "API Key Not Found"
-- Make sure you created a `.env` file (not `.env.example`)
-- Check that your API key is correct
-- Verify the `.env` file is in the project root directory
-
-### "PDF Extraction Failed"
-- Ensure the PDF is not password-protected
-- Check that the file is a valid PDF
-- For scanned PDFs, OCR is not currently supported
-
-### "File Write Failed"
-- Close the output file if it's open in another program
-- Check you have write permissions for the output directory
-- Ensure sufficient disk space
-
-### Long Processing Time
-- Large PDFs (50+ pages) take longer to process
-- API calls may take 30-60 seconds for complex content
-- Be patient - quality takes time!
-
-## Tips for Best Results
-
-1. **Use text-based PDFs**: Works best with PDFs that have selectable text
-2. **Clean PDFs**: Better formatting in the source PDF leads to better notes
-3. **Moderate length**: 10-30 page documents work great; very long documents are chunked
-4. **Review and edit**: AI-generated notes are excellent starting points - personalize them!
-5. **Print or export**: Cornell notes work great both digitally and on paper
-
-## Dependencies
-
-- **anthropic**: Claude API client
-- **python-docx**: DOCX file creation and formatting
-- **pdfplumber**: Advanced PDF content extraction
-- **python-dotenv**: Environment variable management
-- **rich**: Beautiful terminal user interface
-- **PyPDF2**: PDF file handling
-- **Pillow**: Image processing support
-
-## License
-
-This project is provided as-is for educational and personal use.
-
-## Support
-
-For issues or questions:
-1. Check the Troubleshooting section above
-2. Review the [Anthropic API documentation](https://docs.anthropic.com/)
-3. Ensure all dependencies are correctly installed
-
-## Acknowledgments
-
-- Cornell Method developed by Walter Pauk at Cornell University
-- Powered by Claude AI from Anthropic
-- Built with Python and love for learning ❤️
+5. **Abrir el navegador**:
+   ```
+   http://localhost:7860
+   ```
 
 ---
 
-**Happy studying!** 📚✨
+## 📖 Guía de Uso
+
+### 1. Subir Documentos
+
+1. Ve a la pestaña **"📤 Subir Documentos"**
+2. Selecciona tu archivo (PDF, Word, Excel, etc.)
+3. Añade tags opcionales (ej: "ventas, 2024, trimestral")
+4. Agrega una descripción
+5. Haz clic en **"Subir Documento"**
+
+El sistema procesará automáticamente el documento y lo añadirá al repositorio.
+
+### 2. Ejecutar Tareas de IA
+
+1. Ve a la pestaña **"🤖 Tareas de IA"**
+2. Selecciona el tipo de tarea:
+   - **Informe**: Genera un análisis completo
+   - **Correo**: Redacta un email profesional
+   - **Resumen**: Crea una síntesis concisa
+   - **Traducción**: Traduce a otro idioma
+   - **Análisis**: Análisis profundo de datos
+   - Y más...
+3. Añade instrucciones específicas (opcional)
+4. Haz clic en **"Ejecutar Tarea"**
+
+**Ejemplo**:
+- Tarea: `traduccion`
+- Instrucciones: `Traducir al inglés manteniendo el tono profesional`
+
+### 3. Chat con Documentos
+
+1. Ve a la pestaña **"💬 Chat Inteligente"**
+2. Escribe tu pregunta sobre el documento
+3. El agente responderá usando el contexto del documento
+
+**Ejemplos de preguntas**:
+- "¿Cuáles son los puntos clave del documento?"
+- "Resume el capítulo 3"
+- "¿Qué recomendaciones propone el informe?"
+- "Extrae todas las fechas mencionadas"
+
+### 4. Crear Visualizaciones
+
+1. Sube un archivo **Excel** con datos
+2. Ve a la pestaña **"📊 Visualizaciones"**
+3. Selecciona el tipo de gráfico:
+   - **Dashboard**: Vista completa con múltiples gráficos
+   - **Auto**: Selección automática según los datos
+   - **Bar/Line/Pie**: Gráficos específicos
+   - **Heatmap**: Mapa de correlaciones
+   - **Table**: Tabla visual profesional
+4. Añade un título (opcional)
+5. Haz clic en **"Generar Visualización"**
+
+### 5. Buscar Documentos
+
+1. Ve a la pestaña **"🔍 Buscar Documentos"**
+2. Ingresa tu término de búsqueda
+3. El sistema buscará en:
+   - Nombres de archivos
+   - Descripciones
+   - Tags
+   - Contenido de los documentos
+
+---
+
+## 🏗️ Arquitectura del Sistema
+
+```
+creador-apunts-IA/
+├── app.py                          # Punto de entrada principal
+├── .env                            # API Keys (crear manualmente)
+├── requirements.txt                # Dependencias Python
+├── README.md                       # Esta documentación
+│
+├── src/                            # Código fuente
+│   ├── __init__.py
+│   ├── document_manager.py         # Gestión de documentos y storage
+│   ├── document_processor.py       # Procesamiento multi-formato
+│   ├── ai_agent.py                 # Agente IA con Claude
+│   ├── visualization_generator.py  # Generador de gráficos
+│   ├── web_interface.py            # Interfaz web Gradio
+│   │
+│   └── [Módulos legacy]
+│       ├── config.py
+│       ├── main.py
+│       ├── pdf_extractor.py
+│       ├── note_generator.py
+│       └── docx_formatter.py
+│
+├── document_storage/               # Repositorio de documentos
+│   ├── metadata.json              # Base de datos de metadatos
+│   ├── pdf/                       # Documentos PDF
+│   ├── word/                      # Documentos Word
+│   ├── excel/                     # Archivos Excel
+│   ├── text/                      # Archivos de texto
+│   └── image/                     # Imágenes
+│
+└── output/                        # Archivos generados
+    ├── charts/                    # Gráficos
+    ├── tables/                    # Tablas visuales
+    ├── dashboards/                # Dashboards
+    └── infographics/              # Infografías
+```
+
+---
+
+## 🎯 Casos de Uso
+
+### Para Estudiantes 🎓
+
+1. **Resumen de PDFs académicos**:
+   - Sube un paper o libro de texto
+   - Genera resúmenes por capítulo
+   - Crea notas de estudio Cornell (función legacy)
+
+2. **Análisis de datos de investigación**:
+   - Importa datos Excel de experimentos
+   - Genera dashboards automáticos
+   - Obtén análisis estadísticos con IA
+
+3. **Traducción de bibliografía**:
+   - Sube documentos en otros idiomas
+   - Traduce automáticamente
+   - Mantiene formato y referencias
+
+### Para Empresas 💼
+
+1. **Informes ejecutivos**:
+   - Sube reportes largos
+   - Genera resúmenes ejecutivos
+   - Crea presentaciones visuales
+
+2. **Análisis de datos de ventas**:
+   - Importa Excel con datos de ventas
+   - Genera gráficos y dashboards
+   - Obtén insights automáticos con IA
+
+3. **Redacción de correos**:
+   - Sube documentos base (propuestas, informes)
+   - Genera correos profesionales automáticamente
+   - Personaliza con instrucciones específicas
+
+4. **Gestión documental**:
+   - Centraliza todos los documentos
+   - Búsqueda inteligente de contenido
+   - Organización con tags
+
+---
+
+## 🔧 Configuración Avanzada
+
+### Modelos de IA
+
+El sistema usa por defecto:
+- **Claude Opus 4.5** (`claude-opus-4-5-20251101`) - Máxima calidad
+- Puedes cambiar el modelo en `src/ai_agent.py`
+
+Modelos disponibles:
+- `claude-opus-4-5-20251101` (Recomendado)
+- `claude-sonnet-4-5-20250929` (Más rápido)
+- `claude-haiku-4-5-20250122` (Económico)
+
+### Personalización de Visualizaciones
+
+Edita `src/visualization_generator.py` para:
+- Cambiar paletas de colores
+- Ajustar tamaños de gráficos
+- Modificar estilos de tablas
+
+### Storage Personalizado
+
+Por defecto, los documentos se guardan en `./document_storage/`
+
+Para cambiar la ubicación, edita en `src/web_interface.py`:
+```python
+self.doc_manager = DocumentManager(storage_path="./tu/ruta/personalizada")
+```
+
+---
+
+## 📊 Ejemplos de Prompts
+
+### Informes
+```
+"Genera un informe ejecutivo destacando los KPIs principales y las recomendaciones estratégicas"
+```
+
+### Correos
+```
+"Redacta un correo formal para el equipo de ventas resumiendo los resultados del trimestre"
+```
+
+### Análisis
+```
+"Identifica las tendencias de crecimiento y los puntos de mejora en los datos"
+```
+
+### Traducciones
+```
+"Traducir al francés manteniendo el tono técnico y profesional"
+```
+
+---
+
+## 🛠️ Solución de Problemas
+
+### Error: "API Key no encontrada"
+- Verifica que el archivo `.env` existe en la raíz
+- Confirma que la variable `ANTHROPIC_API_KEY` está configurada
+- Reinicia la aplicación
+
+### Error al procesar PDF
+- Asegúrate de que el PDF no esté protegido con contraseña
+- Verifica que el PDF tiene texto seleccionable (no es escaneado)
+- Prueba con un PDF más pequeño primero
+
+### Visualizaciones no se generan
+- Solo funcionan con archivos Excel/CSV
+- Verifica que el archivo tiene datos numéricos
+- Comprueba que `GOOGLE_API_KEY` está configurada (opcional)
+
+### Interfaz web no carga
+- Verifica que el puerto 7860 no esté en uso
+- Prueba con otro puerto: modificar en `app.py`
+- Comprueba los logs en la terminal
+
+---
+
+## 📦 Dependencias
+
+```
+# IA
+anthropic>=0.18.0          # Claude API
+google-generativeai>=0.3.0 # Gemini API
+
+# Procesamiento de documentos
+python-docx>=1.1.0         # Word
+PyPDF2>=3.0.0              # PDF
+pdfplumber>=0.10.0         # PDF avanzado
+openpyxl>=3.1.0            # Excel
+pandas>=2.0.0              # Datos
+
+# Visualización
+matplotlib>=3.7.0          # Gráficos
+seaborn>=0.12.0            # Gráficos estadísticos
+Pillow>=10.0.0             # Imágenes
+
+# Web
+gradio>=4.0.0              # Interfaz web
+
+# Utilidades
+python-dotenv>=1.0.0       # Variables de entorno
+rich>=13.0.0               # Terminal UI
+numpy>=1.24.0              # Cálculos numéricos
+```
+
+---
+
+## 🔐 Seguridad
+
+- **Nunca** compartas tu archivo `.env` o tus API keys
+- El archivo `.env` está en `.gitignore` por defecto
+- Las API keys se cargan de forma segura usando `python-dotenv`
+- Los documentos se almacenan localmente en tu máquina
+
+---
+
+## 🚧 Roadmap
+
+- [ ] Soporte para OCR en PDFs escaneados
+- [ ] Exportación de resultados a PDF
+- [ ] Integración con más modelos de IA
+- [ ] API REST para integración con otros sistemas
+- [ ] Modo colaborativo multi-usuario
+- [ ] Análisis de sentimiento en documentos
+- [ ] Generación de presentaciones PowerPoint
+
+---
+
+## 🤝 Contribuciones
+
+Este proyecto fue desarrollado como herramienta profesional para gestión documental con IA.
+
+Para reportar bugs o sugerir mejoras, contacta con el desarrollador.
+
+---
+
+## 📄 Licencia
+
+Este proyecto se proporciona tal cual para uso educativo y profesional.
+
+---
+
+## 🙏 Agradecimientos
+
+- **Anthropic** - Por Claude, el mejor modelo de lenguaje
+- **Google** - Por Gemini y herramientas de IA
+- **Gradio** - Por la fantástica interfaz web
+- **Python Community** - Por todas las increíbles bibliotecas
+
+---
+
+## 📞 Soporte
+
+Para preguntas o asistencia:
+
+1. Revisa esta documentación completa
+2. Consulta la [Documentación de Claude API](https://docs.anthropic.com/)
+3. Verifica que todas las dependencias están instaladas correctamente
+
+---
+
+**Desarrollado con ❤️ usando Claude Opus 4.5**
+
+*Ideal para estudiantes y empresas que buscan transformar sus documentos en conocimiento accionable.*
+
+🚀 **¡Comienza ahora y potencia tu productividad con IA!**

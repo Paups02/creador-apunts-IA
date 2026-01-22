@@ -47,3 +47,7 @@ test_notes_output.json
 # OS files
 .DS_Store
 Thumbs.db
+
+# Document storage and outputs
+document_storage/
+output/
