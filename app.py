@@ -173,12 +173,14 @@ def main():
         app = DocumentAIWebInterface()
 
         console.print("[green]✓ Aplicación iniciada correctamente[/green]")
-        console.print("\n[bold yellow]🌐 Accede a la interfaz web en:[/bold yellow]")
-        console.print("[bold blue]   http://localhost:7860[/bold blue]\n")
-        console.print("[dim]Presiona Ctrl+C para detener el servidor[/dim]\n")
+        console.print("\n[bold yellow]🌐 Accede a la interfaz web desde:[/bold yellow]")
+        console.print("[bold blue]   http://localhost:8080[/bold blue]")
+        console.print("[bold blue]   http://127.0.0.1:8080[/bold blue]")
+        console.print("[bold blue]   http://21.0.0.198:8080[/bold blue] (desde otros dispositivos)")
+        console.print("\n[dim]Presiona Ctrl+C para detener el servidor[/dim]\n")
 
-        # Lanzar interfaz en localhost
-        app.launch(share=False, server_port=7860)
+        # Lanzar interfaz en todas las interfaces de red
+        app.launch(share=False, server_port=8080)
 
     except KeyboardInterrupt:
         console.print("\n\n[yellow]⚠️  Servidor detenido por el usuario[/yellow]")

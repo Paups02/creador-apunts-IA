@@ -803,7 +803,7 @@ class DocumentAIWebInterface:
         interface.launch(
             share=share,
             server_port=server_port,
-            server_name="127.0.0.1",
+            server_name="0.0.0.0",
             show_error=True,
             quiet=False,
             debug=True
