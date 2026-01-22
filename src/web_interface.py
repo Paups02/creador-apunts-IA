@@ -811,7 +811,7 @@ class DocumentAIWebInterface:
 def main():
     """Función principal"""
     app = DocumentAIWebInterface()
-    app.launch(share=False, server_port=7860)
+    app.launch(share=True, server_port=7860)
 
 
 if __name__ == "__main__":

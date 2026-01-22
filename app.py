@@ -177,7 +177,7 @@ def main():
         console.print("[bold blue]   http://localhost:7860[/bold blue]\n")
         console.print("[dim]Presiona Ctrl+C para detener el servidor[/dim]\n")
 
-        # Lanzar interfaz
+        # Lanzar interfaz en localhost
         app.launch(share=False, server_port=7860)
 
     except KeyboardInterrupt:
