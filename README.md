@@ -39,6 +39,18 @@ Transforme sus documentos en conocimiento accionable con el poder de Claude Anth
 - **Búsqueda inteligente**: Encuentra documentos por contenido, tags o descripción
 - **Gestión completa**: Organiza, etiqueta y administra tu repositorio
 
+### 📁 **NUEVO: Integración Google Drive**
+- **Importar documentos**: Descarga archivos desde tu Google Drive al repositorio
+- **Exportar documentos**: Sube documentos del repositorio a Google Drive
+- **Búsqueda en Drive**: Lista y busca archivos en tu Drive
+- **Gestión de carpetas**: Organiza archivos en carpetas específicas
+
+### ✉️ **NUEVO: Integración Gmail**
+- **Envío automático**: Genera correos con IA y envíalos via Gmail
+- **Correos profesionales**: Emails basados en documentos con IA
+- **Adjuntos**: Incluye archivos en tus correos
+- **Múltiples formatos**: HTML y texto plano
+
 ---
 
 ## 🚀 Instalación Rápida
@@ -70,9 +82,26 @@ Transforme sus documentos en conocimiento accionable con el poder de Claude Anth
    # API Keys
    ANTHROPIC_API_KEY=sk-ant-api03-tu-api-key-aqui
    GOOGLE_API_KEY=tu-google-api-key-aqui
+
+   # Opcional: Para Google Drive y Gmail
+   GOOGLE_DRIVE_API_KEY=tu-google-api-key-aqui
+   GOOGLE_CLIENT_ID=tu-client-id.apps.googleusercontent.com
    ```
 
-4. **Lanzar la aplicación**:
+4. **[OPCIONAL] Configurar Google Drive y Gmail**:
+
+   Para habilitar las integraciones con Google:
+   ```bash
+   # Consulta la guía completa
+   cat GOOGLE_SETUP.md
+   ```
+
+   Resumen rápido:
+   - Descarga credenciales OAuth desde Google Cloud Console
+   - Guárdalas como `google_credentials.json` en la raíz
+   - La primera vez que uses Drive/Gmail, se abrirá el navegador para autenticar
+
+5. **Lanzar la aplicación**:
    ```bash
    python app.py
    ```
