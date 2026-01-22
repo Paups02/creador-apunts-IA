@@ -806,7 +806,8 @@ class DocumentAIWebInterface:
             server_name="0.0.0.0",
             show_error=True,
             quiet=False,
-            debug=True
+            debug=True,
+            inbrowser=True
         )
 
 
