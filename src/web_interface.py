@@ -14,6 +14,7 @@ from document_manager import DocumentManager
 from document_processor import DocumentProcessor
 from ai_agent import AIAgent
 from visualization_generator import VisualizationGenerator
+from google_integration import GoogleIntegration
 
 from rich.console import Console
 
@@ -34,6 +35,13 @@ class DocumentAIWebInterface:
         self.doc_processor = DocumentProcessor()
         self.ai_agent = AIAgent()
         self.viz_generator = VisualizationGenerator()
+
+        # Inicializar integraciones de Google
+        try:
+            self.google = GoogleIntegration()
+        except Exception as e:
+            console.print(f"[yellow]⚠ Integraciones de Google en modo limitado: {str(e)}[/yellow]")
+            self.google = None
 
         # Estado de sesión
         self.current_doc_id = None
@@ -270,14 +278,181 @@ class DocumentAIWebInterface:
 
         return output
 
+    def list_drive_files(self, search_query: str = "") -> str:
+        """Lista archivos en Google Drive"""
+        if not self.google or not self.google.is_drive_available():
+            return "⚠️ **Google Drive no está disponible**\n\n" + \
+                   "Para usar Google Drive:\n" + \
+                   "1. Descarga las credenciales OAuth desde Google Cloud Console\n" + \
+                   "2. Guárdalas como `google_credentials.json` en la raíz del proyecto\n" + \
+                   "3. Reinicia la aplicación"
+
+        try:
+            files = self.google.drive.list_files(query=search_query)
+
+            if not files:
+                return "📂 **No se encontraron archivos en Google Drive**"
+
+            output = f"# 📂 Archivos en Google Drive\n\n"
+            output += f"**{len(files)} archivo(s) encontrado(s)**\n\n"
+
+            for file in files:
+                output += f"---\n\n"
+                output += f"### 📄 {file['name']}\n"
+                output += f"- **ID:** `{file['id']}`\n"
+                output += f"- **Tipo:** {file.get('mimeType', 'N/A')}\n"
+                output += f"- **Tamaño:** {int(file.get('size', 0)) / 1024:.1f} KB\n"
+                output += f"- **Modificado:** {file.get('modifiedTime', 'N/A')[:10]}\n\n"
+
+            return output
+
+        except Exception as e:
+            return f"❌ **Error:** {str(e)}"
+
+    def import_from_drive(self, file_id: str, tags_str: str = "", description: str = "") -> str:
+        """Importa un archivo desde Google Drive al repositorio local"""
+        if not self.google or not self.google.is_drive_available():
+            return "⚠️ Google Drive no está disponible"
+
+        try:
+            # Descargar archivo temporalmente
+            temp_path = f"./temp_drive_download_{file_id}"
+            success = self.google.drive.download_file(file_id, temp_path)
+
+            if not success:
+                return "❌ Error descargando archivo de Drive"
+
+            # Importar al repositorio
+            tags = [tag.strip() for tag in tags_str.split(",") if tag.strip()]
+            doc_id = self.doc_manager.add_document(
+                temp_path,
+                tags=tags,
+                description=description or f"Importado desde Google Drive ({file_id})"
+            )
+
+            # Procesar contenido
+            doc_type = self.doc_manager.get_document(doc_id)["type"]
+            processed = self.doc_processor.process_document(temp_path, doc_type)
+
+            # Guardar ID actual
+            self.current_doc_id = doc_id
+            self.current_doc_content = self.doc_processor.extract_text_content(processed)
+
+            # Limpiar archivo temporal
+            import os
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+
+            message = f"✅ **Archivo importado desde Drive**\n\n"
+            message += f"📄 **ID:** {doc_id}\n"
+            message += f"📁 **Tipo:** {doc_type}\n\n"
+            message += f"*El documento está listo para usar con las tareas de IA.*"
+
+            return message
+
+        except Exception as e:
+            return f"❌ **Error:** {str(e)}"
+
+    def export_to_drive(self, folder_id: str = "") -> str:
+        """Exporta el documento actual a Google Drive"""
+        if not self.google or not self.google.is_drive_available():
+            return "⚠️ Google Drive no está disponible"
+
+        if not self.current_doc_id:
+            return "⚠️ Primero debes seleccionar un documento"
+
+        try:
+            doc = self.doc_manager.get_document(self.current_doc_id)
+            file_id = self.google.drive.upload_file(
+                doc["path"],
+                folder_id=folder_id if folder_id else None
+            )
+
+            if file_id:
+                return f"✅ **Documento exportado a Google Drive**\n\n**ID:** `{file_id}`"
+            else:
+                return "❌ Error exportando a Drive"
+
+        except Exception as e:
+            return f"❌ **Error:** {str(e)}"
+
+    def send_email_with_ai(self, to: str, task_type: str = "correo", instructions: str = "") -> str:
+        """Genera un correo con IA y lo envía via Gmail"""
+        if not self.google or not self.google.is_gmail_available():
+            return "⚠️ **Gmail no está disponible**\n\n" + \
+                   "Para usar Gmail:\n" + \
+                   "1. Descarga las credenciales OAuth desde Google Cloud Console\n" + \
+                   "2. Guárdalas como `google_credentials.json` en la raíz del proyecto\n" + \
+                   "3. Habilita Gmail API en tu proyecto de Google Cloud\n" + \
+                   "4. Reinicia la aplicación"
+
+        if not self.current_doc_content:
+            return "⚠️ Primero debes subir un documento"
+
+        if not to or '@' not in to:
+            return "⚠️ Ingresa un email válido"
+
+        try:
+            # Generar contenido del correo con IA
+            result = self.ai_agent.execute_task(
+                task_type=task_type,
+                content=self.current_doc_content,
+                user_instructions=instructions or "Crear un correo profesional"
+            )
+
+            if not result["success"]:
+                return f"❌ Error generando correo: {result.get('error')}"
+
+            email_content = result["result"]
+
+            # Enviar correo
+            success = self.google.gmail.send_email_with_ai_content(to, email_content)
+
+            if success:
+                return f"✅ **Correo enviado exitosamente a:** {to}\n\n### Vista previa:\n\n{email_content[:500]}..."
+            else:
+                return "❌ Error enviando correo"
+
+        except Exception as e:
+            return f"❌ **Error:** {str(e)}"
+
+    def get_google_status(self) -> str:
+        """Obtiene el estado de las integraciones de Google"""
+        if not self.google:
+            return "⚠️ **Integraciones de Google no disponibles**"
+
+        status = self.google.get_status()
+
+        output = "# 🔗 Estado de Integraciones Google\n\n"
+
+        # Drive
+        if status["drive"]:
+            output += "✅ **Google Drive:** Conectado\n"
+        else:
+            output += "❌ **Google Drive:** No disponible\n"
+
+        # Gmail
+        if status["gmail"]:
+            output += "✅ **Gmail:** Conectado\n"
+        else:
+            output += "❌ **Gmail:** No disponible\n"
+
+        output += "\n### Configuración\n\n"
+        output += "Para habilitar estas integraciones:\n"
+        output += "1. Ve a [Google Cloud Console](https://console.cloud.google.com/)\n"
+        output += "2. Crea un proyecto y habilita Drive API y Gmail API\n"
+        output += "3. Descarga las credenciales OAuth 2.0\n"
+        output += "4. Guárdalas como `google_credentials.json` en la raíz del proyecto\n"
+        output += "5. Reinicia la aplicación\n"
+
+        return output
+
     def create_gradio_interface(self) -> gr.Blocks:
         """Crea la interfaz Gradio completa"""
 
-        with gr.Blocks(
-            theme=gr.themes.Soft(),
-            title="Agente de IA Documental Profesional"
-        ) as interface:
+        interface = gr.Blocks(title="Agente de IA Documental Profesional")
 
+        with interface:
             gr.Markdown("""
             # 🤖 Agente de IA Documental Profesional
             ### Powered by Claude Anthropic & Google AI
@@ -288,6 +463,8 @@ class DocumentAIWebInterface:
             - 📊 Visualización de datos y creación de gráficos
             - 💬 Chat interactivo con tus documentos
             - 🔍 Búsqueda y análisis inteligente
+            - 📁 **NUEVO:** Integración con Google Drive
+            - ✉️ **NUEVO:** Envío de correos vía Gmail con IA
 
             **Ideal para estudiantes y empresas** ✨
             """)
@@ -469,9 +646,111 @@ class DocumentAIWebInterface:
                         outputs=search_output
                     )
 
-                # TAB 6: Estadísticas
+                # TAB 6: Google Drive
+                with gr.Tab("📁 Google Drive"):
+                    gr.Markdown("### Integración con Google Drive")
+                    gr.Markdown("*Importa y exporta documentos desde/hacia tu Drive*")
+
+                    with gr.Row():
+                        with gr.Column():
+                            gr.Markdown("#### 📥 Importar desde Drive")
+                            drive_search = gr.Textbox(
+                                label="Buscar archivos (opcional)",
+                                placeholder="Ej: nombre del archivo"
+                            )
+                            list_drive_btn = gr.Button("📂 Listar Archivos", variant="secondary")
+                            drive_files_output = gr.Markdown()
+
+                            list_drive_btn.click(
+                                fn=self.list_drive_files,
+                                inputs=drive_search,
+                                outputs=drive_files_output
+                            )
+
+                            gr.Markdown("---")
+
+                            file_id_input = gr.Textbox(
+                                label="ID del archivo en Drive",
+                                placeholder="Copia el ID del archivo de la lista arriba"
+                            )
+                            import_tags = gr.Textbox(
+                                label="Tags",
+                                placeholder="Ej: drive, importante"
+                            )
+                            import_desc = gr.Textbox(
+                                label="Descripción",
+                                placeholder="Descripción del documento"
+                            )
+                            import_btn = gr.Button("⬇️ Importar a Repositorio", variant="primary")
+                            import_output = gr.Markdown()
+
+                            import_btn.click(
+                                fn=self.import_from_drive,
+                                inputs=[file_id_input, import_tags, import_desc],
+                                outputs=import_output
+                            )
+
+                        with gr.Column():
+                            gr.Markdown("#### 📤 Exportar a Drive")
+                            folder_id_input = gr.Textbox(
+                                label="ID de carpeta destino (opcional)",
+                                placeholder="Dejar vacío para raíz de Drive"
+                            )
+                            export_btn = gr.Button("⬆️ Exportar Documento Actual", variant="primary")
+                            export_output = gr.Markdown()
+
+                            export_btn.click(
+                                fn=self.export_to_drive,
+                                inputs=folder_id_input,
+                                outputs=export_output
+                            )
+
+                # TAB 7: Gmail
+                with gr.Tab("✉️ Gmail"):
+                    gr.Markdown("### Enviar Correos con IA")
+                    gr.Markdown("*Genera correos profesionales con IA y envíalos via Gmail*")
+
+                    with gr.Row():
+                        with gr.Column(scale=1):
+                            email_to = gr.Textbox(
+                                label="Para:",
+                                placeholder="destinatario@ejemplo.com"
+                            )
+                            email_task = gr.Dropdown(
+                                label="Tipo de correo",
+                                choices=["correo", "informe", "resumen"],
+                                value="correo"
+                            )
+                            email_instructions = gr.Textbox(
+                                label="Instrucciones para la IA",
+                                placeholder="Ej: Crear un correo formal presentando los resultados",
+                                lines=4
+                            )
+                            send_email_btn = gr.Button("📧 Generar y Enviar", variant="primary", size="lg")
+
+                        with gr.Column(scale=2):
+                            email_output = gr.Markdown()
+
+                    gr.Markdown("""
+                    #### 📋 Instrucciones:
+                    1. Primero sube un documento (pestaña "Subir Documentos")
+                    2. Ingresa el email del destinatario
+                    3. Selecciona el tipo de correo
+                    4. Añade instrucciones específicas (opcional)
+                    5. Haz clic en "Generar y Enviar"
+
+                    **Nota:** La IA generará el contenido basado en el documento actual.
+                    """)
+
+                    send_email_btn.click(
+                        fn=self.send_email_with_ai,
+                        inputs=[email_to, email_task, email_instructions],
+                        outputs=email_output
+                    )
+
+                # TAB 8: Estadísticas
                 with gr.Tab("📈 Estadísticas"):
-                    gr.Markdown("### Estadísticas del repositorio")
+                    gr.Markdown("### Estadísticas del repositorio e integraciones")
 
                     stats_btn = gr.Button("🔄 Actualizar Estadísticas", variant="secondary")
                     stats_output = gr.Markdown(self.get_storage_stats())
@@ -481,12 +760,25 @@ class DocumentAIWebInterface:
                         outputs=stats_output
                     )
 
+                    gr.Markdown("---")
+
+                    google_status_btn = gr.Button("🔗 Estado de Google", variant="secondary")
+                    google_status_output = gr.Markdown(self.get_google_status())
+
+                    google_status_btn.click(
+                        fn=self.get_google_status,
+                        outputs=google_status_output
+                    )
+
             gr.Markdown("""
             ---
-            **Desarrollado con:** Claude Opus 4.5 (Anthropic) + Gemini (Google AI) | **Interfaz:** Gradio
+            **Desarrollado con:** Claude Opus 4.5 (Anthropic) + Gemini (Google AI) + Google Drive & Gmail | **Interfaz:** Gradio
 
-            *Sistema versátil para estudiantes y empresas* 🎓💼
+            *Sistema versátil y potente para estudiantes y empresas* 🎓💼
             """)
+
+            # Aplicar tema después de crear la interfaz
+            interface.theme = gr.themes.Soft()
 
         return interface
 
