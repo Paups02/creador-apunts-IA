@@ -1,6 +1,11 @@
 # Environment variables - IMPORTANT: Never commit API keys!
 .env
 
+# Google OAuth credentials and tokens
+google_credentials.json
+google_token.json
+gmail_token.json
+
 # Python
 __pycache__/
 *.py[cod]
