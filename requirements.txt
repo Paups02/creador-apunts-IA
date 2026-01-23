@@ -27,6 +27,10 @@ uvicorn[standard]>=0.24.0
 python-dotenv>=1.0.0
 rich>=13.0.0
 
+# Document Generation
+reportlab>=4.0.0
+fpdf2>=2.7.0
+
 # Additional dependencies
 numpy>=1.24.0
 cffi>=1.15.0
