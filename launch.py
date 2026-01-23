@@ -1,56 +1,216 @@
 #!/usr/bin/env python3
 """
-Simple launcher for Cornell Notes Converter web interface
-Just run: python launch.py
+Launcher - Agente de IA Documental
+===================================
+
+Inicia tanto el servidor backend (API) como el frontend (interfaz web).
 """
 
+import subprocess
 import sys
 import os
+import time
+import signal
+from pathlib import Path
 
-# Fix encoding for Windows
-if sys.platform == 'win32':
-    import codecs
-    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
-    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
+# Colores para la terminal
+class Colors:
+    HEADER = '\033[95m'
+    BLUE = '\033[94m'
+    CYAN = '\033[96m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+
+processes = []
+
+def print_banner():
+    """Imprime el banner de inicio"""
+    banner = f"""
+{Colors.CYAN}{Colors.BOLD}
+    ╔═══════════════════════════════════════════════════════════════╗
+    ║                                                               ║
+    ║         🤖 AGENTE DE IA DOCUMENTAL PROFESIONAL 🤖            ║
+    ║                                                               ║
+    ║            Powered by Claude Anthropic & Google AI           ║
+    ║                                                               ║
+    ╚═══════════════════════════════════════════════════════════════╝
+{Colors.ENDC}
+
+{Colors.BOLD}    📄 Gestión Inteligente de Documentos Multi-Formato
+    🤖 IA Avanzada para Análisis y Generación de Contenido
+    📊 Visualizaciones y Gráficos Profesionales
+    💬 Chat Interactivo con tus Documentos{Colors.ENDC}
+
+    {Colors.YELLOW}✨ Ideal para Estudiantes y Empresas ✨{Colors.ENDC}
+    """
+    print(banner)
+
+def cleanup(signum=None, frame=None):
+    """Limpia procesos al salir"""
+    print(f"\n{Colors.YELLOW}🛑 Deteniendo servidores...{Colors.ENDC}")
+
+    for process in processes:
+        try:
+            process.terminate()
+            process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            process.kill()
+        except Exception as e:
+            print(f"{Colors.RED}Error al detener proceso: {e}{Colors.ENDC}")
+
+    print(f"{Colors.GREEN}✅ Servidores detenidos correctamente{Colors.ENDC}")
+    sys.exit(0)
+
+def check_dependencies():
+    """Verifica dependencias necesarias"""
+    print(f"{Colors.CYAN}🔍 Verificando dependencias...{Colors.ENDC}\n")
+
+    required_packages = {
+        'fastapi': 'FastAPI',
+        'uvicorn': 'Uvicorn',
+        'anthropic': 'Anthropic',
+        'dotenv': 'python-dotenv'
+    }
+
+    missing = []
+
+    for package, name in required_packages.items():
+        try:
+            __import__(package)
+            print(f"{Colors.GREEN}✓ {name}{Colors.ENDC}")
+        except ImportError:
+            print(f"{Colors.RED}✗ {name}{Colors.ENDC}")
+            missing.append(name)
+
+    if missing:
+        print(f"\n{Colors.RED}❌ Faltan dependencias: {', '.join(missing)}{Colors.ENDC}")
+        print(f"{Colors.YELLOW}Instala con: pip install fastapi uvicorn{Colors.ENDC}\n")
+        return False
+
+    print(f"\n{Colors.GREEN}✅ Todas las dependencias están instaladas{Colors.ENDC}\n")
+    return True
+
+def start_backend():
+    """Inicia el servidor backend"""
+    print(f"{Colors.CYAN}🚀 Iniciando servidor backend (API REST)...{Colors.ENDC}")
+
+    backend_process = subprocess.Popen(
+        [sys.executable, "backend_api.py"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        universal_newlines=True,
+        bufsize=1
+    )
+
+    processes.append(backend_process)
+
+    # Esperar a que el backend esté listo
+    time.sleep(3)
+
+    if backend_process.poll() is None:
+        print(f"{Colors.GREEN}✅ Backend iniciado correctamente en http://localhost:8000{Colors.ENDC}\n")
+        return True
+    else:
+        print(f"{Colors.RED}❌ Error al iniciar el backend{Colors.ENDC}\n")
+        return False
+
+def start_frontend():
+    """Inicia el servidor frontend"""
+    print(f"{Colors.CYAN}🚀 Iniciando servidor frontend (Interfaz Web)...{Colors.ENDC}")
+
+    frontend_process = subprocess.Popen(
+        [sys.executable, "frontend_server.py"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        universal_newlines=True,
+        bufsize=1
+    )
+
+    processes.append(frontend_process)
+
+    # Esperar a que el frontend esté listo
+    time.sleep(2)
+
+    if frontend_process.poll() is None:
+        print(f"{Colors.GREEN}✅ Frontend iniciado correctamente en http://localhost:3000{Colors.ENDC}\n")
+        return True
+    else:
+        print(f"{Colors.RED}❌ Error al iniciar el frontend{Colors.ENDC}\n")
+        return False
+
+def open_browser():
+    """Intenta abrir el navegador automáticamente"""
+    import webbrowser
+    try:
+        print(f"{Colors.CYAN}🌐 Abriendo navegador...{Colors.ENDC}\n")
+        webbrowser.open('http://localhost:3000')
+    except Exception as e:
+        print(f"{Colors.YELLOW}⚠️  No se pudo abrir el navegador automáticamente: {e}{Colors.ENDC}")
+        print(f"{Colors.YELLOW}   Abre manualmente: http://localhost:3000{Colors.ENDC}\n")
 
 def main():
-    """Launch the web interface"""
-    print("=" * 70)
-    print("🚀 Launching Cornell Notes Converter")
-    print("=" * 70)
-    print()
+    """Función principal"""
+    # Configurar señales para limpieza
+    signal.signal(signal.SIGINT, cleanup)
+    signal.signal(signal.SIGTERM, cleanup)
 
-    # Check Gradio installation
+    # Mostrar banner
+    print_banner()
+
+    # Verificar dependencias
+    if not check_dependencies():
+        sys.exit(1)
+
+    # Iniciar servidores
+    print(f"\n{Colors.BOLD}{'='*60}{Colors.ENDC}\n")
+
+    if not start_backend():
+        cleanup()
+        sys.exit(1)
+
+    if not start_frontend():
+        cleanup()
+        sys.exit(1)
+
+    print(f"{Colors.BOLD}{'='*60}{Colors.ENDC}\n")
+
+    # Mostrar información
+    print(f"""
+{Colors.GREEN}{Colors.BOLD}✅ SISTEMA INICIADO CORRECTAMENTE{Colors.ENDC}
+
+{Colors.BOLD}🌐 URLs de acceso:{Colors.ENDC}
+   {Colors.BLUE}Frontend (Interfaz Web):{Colors.ENDC}  http://localhost:3000
+   {Colors.BLUE}Backend (API REST):    {Colors.ENDC}  http://localhost:8000
+   {Colors.BLUE}Documentación API:     {Colors.ENDC}  http://localhost:8000/docs
+
+{Colors.BOLD}💡 Instrucciones:{Colors.ENDC}
+   1. Abre tu navegador en {Colors.CYAN}http://localhost:3000{Colors.ENDC}
+   2. Sube documentos desde la pestaña "Subir Documentos"
+   3. Usa las tareas de IA para procesar contenido
+   4. Chatea con tus documentos en "Chat Inteligente"
+
+{Colors.YELLOW}Presiona Ctrl+C para detener ambos servidores{Colors.ENDC}
+    """)
+
+    # Abrir navegador
+    time.sleep(1)
+    open_browser()
+
+    # Mantener el script corriendo
     try:
-        import gradio
-        print(f"✓ Gradio {gradio.__version__} detected")
-    except ImportError:
-        print("⚠️  Gradio not installed. Installing now...")
-        import subprocess
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "gradio>=4.0.0"])
-        print("✓ Gradio installed")
-
-    print()
-    print("📱 Starting web server...")
-    print("   Your browser should open automatically")
-    print("   If not, visit: http://127.0.0.1:7861")
-    print()
-    print("💡 Press Ctrl+C to stop the server")
-    print("=" * 70)
-    print()
-
-    # Launch the app
-    from src.web_app import launch_app
-    launch_app(server_port=7861)
+        while True:
+            time.sleep(1)
+            # Verificar que los procesos sigan corriendo
+            for i, process in enumerate(processes):
+                if process.poll() is not None:
+                    print(f"\n{Colors.RED}❌ Un servidor se detuvo inesperadamente{Colors.ENDC}")
+                    cleanup()
+                    sys.exit(1)
+    except KeyboardInterrupt:
+        cleanup()
 
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("\n\n👋 Server stopped. Goodbye!")
-        sys.exit(0)
-    except Exception as e:
-        print(f"\n❌ Error: {e}")
-        import traceback
-        traceback.print_exc()
-        sys.exit(1)
+    main()
