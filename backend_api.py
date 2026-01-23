@@ -47,9 +47,23 @@ app.add_middleware(
 )
 
 # Inicializar componentes
-doc_manager = DocumentManager()
-doc_processor = DocumentProcessor()
-ai_agent = AIAgent()
+try:
+    print("Inicializando DocumentManager...")
+    doc_manager = DocumentManager()
+    print("✓ DocumentManager inicializado")
+
+    print("Inicializando DocumentProcessor...")
+    doc_processor = DocumentProcessor()
+    print("✓ DocumentProcessor inicializado")
+
+    print("Inicializando AIAgent...")
+    ai_agent = AIAgent()
+    print("✓ AIAgent inicializado")
+except Exception as e:
+    import traceback
+    print(f"ERROR al inicializar componentes: {e}")
+    print(traceback.format_exc())
+    raise
 
 # Modelos Pydantic
 class AITaskRequest(BaseModel):
@@ -135,7 +149,10 @@ async def list_documents():
             "total": len(docs)
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        error_detail = f"{str(e)}\n\nTraceback:\n{traceback.format_exc()}"
+        print(f"ERROR en /api/documents/list: {error_detail}")
+        raise HTTPException(status_code=500, detail=error_detail)
 
 @app.get("/api/documents/{doc_id}")
 async def get_document(doc_id: str):
@@ -260,7 +277,10 @@ async def get_stats():
             }
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        error_detail = f"{str(e)}\n\nTraceback:\n{traceback.format_exc()}"
+        print(f"ERROR en /api/stats: {error_detail}")
+        raise HTTPException(status_code=500, detail=error_detail)
 
 
 def start_server(port: int = 8000):
