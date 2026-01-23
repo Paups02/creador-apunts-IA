@@ -9,6 +9,7 @@ API REST con FastAPI para interactuar con el sistema de gestión documental.
 import sys
 import os
 from pathlib import Path
+import tempfile
 
 # Añadir src al path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
@@ -111,19 +112,20 @@ async def upload_document(
 ):
     """Subir un documento al sistema"""
     try:
-        # Guardar archivo temporalmente
-        temp_path = f"/tmp/{file.filename}"
+        # Guardar archivo temporalmente (compatible con Windows)
+        temp_dir = Path(tempfile.gettempdir())
+        temp_path = temp_dir / file.filename
         with open(temp_path, "wb") as f:
             content = await file.read()
             f.write(content)
 
         # Procesar documento
-        processed = doc_processor.process_document(temp_path)
+        processed = doc_processor.process_document(str(temp_path))
 
         # Agregar a la base de datos
         tags_list = [t.strip() for t in tags.split(",")] if tags else []
         doc_id = doc_manager.add_document(
-            file_path=temp_path,
+            file_path=str(temp_path),
             tags=tags_list,
             description=description
         )
