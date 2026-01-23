@@ -1,6 +1,15 @@
 // Configuración
-const API_URL = 'http://localhost:8000';
+// Detectar automáticamente la URL del backend basada en el hostname actual
+const getApiUrl = () => {
+    const hostname = window.location.hostname;
+    // Si estamos accediendo con una IP o hostname específico, usar el mismo para el backend
+    return `http://${hostname}:8000`;
+};
+
+const API_URL = getApiUrl();
 let currentDocuments = [];
+
+console.log('🔗 API URL:', API_URL);
 
 // Inicializar aplicación
 document.addEventListener('DOMContentLoaded', () => {

@@ -141,15 +141,40 @@ def start_frontend():
         print(f"{Colors.RED}❌ Error al iniciar el frontend{Colors.ENDC}\n")
         return False
 
+def get_ip_address():
+    """Obtiene la dirección IP del sistema"""
+    import socket
+    try:
+        # Intentar obtener la IP de WSL
+        result = subprocess.run(['hostname', '-I'], capture_output=True, text=True)
+        if result.returncode == 0:
+            ip = result.stdout.strip().split()[0]
+            return ip
+    except:
+        pass
+
+    # Método alternativo
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except:
+        return "127.0.0.1"
+
 def open_browser():
     """Intenta abrir el navegador automáticamente"""
     import webbrowser
+    ip = get_ip_address()
+
     try:
-        print(f"{Colors.CYAN}🌐 Abriendo navegador...{Colors.ENDC}\n")
-        webbrowser.open('http://localhost:3000')
+        print(f"{Colors.CYAN}🌐 Intentando abrir navegador...{Colors.ENDC}\n")
+        # Intentar con la IP del sistema primero
+        webbrowser.open(f'http://{ip}:3000')
     except Exception as e:
-        print(f"{Colors.YELLOW}⚠️  No se pudo abrir el navegador automáticamente: {e}{Colors.ENDC}")
-        print(f"{Colors.YELLOW}   Abre manualmente: http://localhost:3000{Colors.ENDC}\n")
+        print(f"{Colors.YELLOW}⚠️  No se pudo abrir el navegador automáticamente{Colors.ENDC}")
+        print(f"{Colors.YELLOW}   Abre manualmente una de estas URLs{Colors.ENDC}\n")
 
 def main():
     """Función principal"""
@@ -177,17 +202,26 @@ def main():
 
     print(f"{Colors.BOLD}{'='*60}{Colors.ENDC}\n")
 
+    # Obtener IP del sistema
+    system_ip = get_ip_address()
+
     # Mostrar información
     print(f"""
 {Colors.GREEN}{Colors.BOLD}✅ SISTEMA INICIADO CORRECTAMENTE{Colors.ENDC}
 
-{Colors.BOLD}🌐 URLs de acceso:{Colors.ENDC}
-   {Colors.BLUE}Frontend (Interfaz Web):{Colors.ENDC}  http://localhost:3000
-   {Colors.BLUE}Backend (API REST):    {Colors.ENDC}  http://localhost:8000
-   {Colors.BLUE}Documentación API:     {Colors.ENDC}  http://localhost:8000/docs
+{Colors.BOLD}🌐 URLs de acceso (usa cualquiera):{Colors.ENDC}
+
+{Colors.CYAN}{Colors.BOLD}   → RECOMENDADO (para Windows/WSL):{Colors.ENDC}
+   {Colors.BLUE}Frontend:{Colors.ENDC}  http://{system_ip}:3000
+   {Colors.BLUE}Backend: {Colors.ENDC}  http://{system_ip}:8000
+
+{Colors.BOLD}   → Alternativas (localhost):{Colors.ENDC}
+   Frontend:  http://localhost:3000
+   Backend:   http://localhost:8000
+   API Docs:  http://localhost:8000/docs
 
 {Colors.BOLD}💡 Instrucciones:{Colors.ENDC}
-   1. Abre tu navegador en {Colors.CYAN}http://localhost:3000{Colors.ENDC}
+   1. Abre tu navegador en {Colors.CYAN}http://{system_ip}:3000{Colors.ENDC}
    2. Sube documentos desde la pestaña "Subir Documentos"
    3. Usa las tareas de IA para procesar contenido
    4. Chatea con tus documentos en "Chat Inteligente"
